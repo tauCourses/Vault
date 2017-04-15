@@ -79,8 +79,10 @@ int removeDelimitersInFileBlocks(int vaultFile, blockMetadata *blocks)
 	{
 		if(blocks[i].size == 0)
 			break;
-		writeCharToFile(vaultFile, blocks[i].offset, '\0', DELIMETER_SIZE);
-		writeCharToFile(vaultFile, blocks[i].offset + blocks[i].size - DELIMETER_SIZE, '\0', DELIMETER_SIZE);
+		if(writeCharToFile(vaultFile, blocks[i].offset, '\0', DELIMETER_SIZE) == -1)
+			return -1;
+		if(writeCharToFile(vaultFile, blocks[i].offset + blocks[i].size - DELIMETER_SIZE, '\0', DELIMETER_SIZE) == -1)
+			return -1;
 	}
 	return 0;
 }

@@ -59,7 +59,10 @@ int main( int argc, char *argv[] )
 		printf("Unknown operation\n");
 		return -1;
 	}
-	return (*operationFunctionArray[operation])(argc, argv);
+	int value = (*operationFunctionArray[operation])(argc, argv);
+	if(value == -1)
+		printf("vault program failed\n");
+	return value;
 }
 
 OPERATIONS_TYPES getOperation(char* str)
