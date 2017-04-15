@@ -11,11 +11,12 @@
 #include <ctype.h>
 
 #include "vaultUtils.h"
+
 #include "initVault.h"
 #include "insertFile.h"
 #include "listing.h"
 #include "remove.h"
-
+#include "fetchFile.h"
 #include "defrag.h"
 #include "status.h"
 
@@ -39,7 +40,7 @@ operationFunction operationFunctionArray[] = {	initVault,
 												listing, 
 												insertFile, 
 												removeFile,
-												removeFile,//fetchFile,
+												fetchFile,
 												defragVault,
 												getStatus}; //an array of function pointers for each operation
 

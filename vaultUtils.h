@@ -51,6 +51,7 @@ extern const off_t BLOCKS_OFFSET;
 
 
 int openFile(int *file, char *address, int oflag);
+int openFile(int *file, char *address, int oflag, mode_t mode);
 
 int getRepositoryMetadata(int vaultFile, repositoryMetadata *repository);
 int saveRepositoryMetadata(int vaultFile, repositoryMetadata repository);
