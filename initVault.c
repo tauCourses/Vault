@@ -40,7 +40,7 @@ int initVault(int argc, char *argv[])
 		printf("Size is too small, please create a bigger file\n");
 		return -1;
 	}
-	if(openFile(&vaultFile, argv[1], INIT_FILE_OPEN_FLAG) == -1)
+	if(openFile(&vaultFile, argv[1], INIT_FILE_OPEN_FLAG,VAULT_MODE_T) == -1)
 		return -1;
 	
 

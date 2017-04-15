@@ -36,7 +36,7 @@ int insertFile(int argc, char *argv[])
 		return -1;
 	}
 
-	if(openFile(&vaultFile, argv[1], INSERT_VAULT_FILE_OPEN_FLAG) == -1)
+	if(openFile(&vaultFile, argv[1], INSERT_VAULT_FILE_OPEN_FLAG, 0) == -1)
 		return -1;
 
 	if(getRepositoryMetadata(vaultFile, &repo) == -1)
@@ -52,7 +52,7 @@ int insertFile(int argc, char *argv[])
 	}
 	
 	
-	if(openFile(&insertFile, argv[3], INSERT_NEW_OPEN_FLAG) == -1)
+	if(openFile(&insertFile, argv[3], INSERT_NEW_OPEN_FLAG, VAULT_MODE_T) == -1)
 		return -1;
 
 	if(checkIfFileExist(argv[3], files) != -1)

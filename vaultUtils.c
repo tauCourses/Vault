@@ -20,10 +20,13 @@ const off_t BLOCKS_OFFSET = sizeof(repositoryMetadata) + MAX_NUMBER_OF_FILES * s
 
 	
 
-int openFile(int *file, char *address, int oflag)
+int openFile(int *file, char *address, int oflag, mode_t mode)
 {
 	char * name = basename	(address);
-	*file = open(address, oflag, 0644);  //open vault file
+	if(mode == 0)
+		*file = open(address, oflag);
+	else
+		*file = open(address, oflag, mode);  //open vault file
 	if (*file < 0) 
 	{
 		printf( "Error opening %s file: %s\n", name,  strerror( errno ) );

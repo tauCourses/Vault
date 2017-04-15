@@ -4,7 +4,7 @@
 #include "vaultUtils.h"
 
 #define INIT_NUMBER_OF_ARGUMENTS 4
-#define INIT_FILE_OPEN_FLAG O_RDWR | O_CREAT
+#define INIT_FILE_OPEN_FLAG O_RDWR | O_CREAT | O_TRUNC
 
 int initVault(int argc, char *argv[]);
 int parseDataAmount(char* arg, size_t *fileSize);

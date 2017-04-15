@@ -28,7 +28,7 @@ int fetchFile(int argc, char *argv[])
 		return -1;
 	}
 
-	if(openFile(&vaultFile, argv[1], FETCH_VAULT_FILE_OPEN_FLAG) == -1)
+	if(openFile(&vaultFile, argv[1], FETCH_VAULT_FILE_OPEN_FLAG, 0) == -1)
 		return -1;
 
 	if(getRepositoryMetadata(vaultFile, &repo) == -1)
@@ -44,7 +44,7 @@ int fetchFile(int argc, char *argv[])
 		return -1;
 	}
 
-	if(openFile(&fetchFile, argv[3], FETCH_NEW_FILE_OPEN_FLAG) == -1) //todo - permmisions!
+	if(openFile(&fetchFile, argv[3], FETCH_NEW_FILE_OPEN_FLAG, files[fetchFileNumber].permissions) == -1) //todo - permmisions!
 		return -1;
 
 	if(copyFile(vaultFile, fetchFile, files[fetchFileNumber]) == -1)

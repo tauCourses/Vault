@@ -33,7 +33,7 @@ int defragVault(int argc, char *argv[])
 		return -1;
 	}
 
-	if(openFile(&vaultFile, argv[1], DEFRAG_VAULT_FILE_OPEN_FLAG) == -1)
+	if(openFile(&vaultFile, argv[1], DEFRAG_VAULT_FILE_OPEN_FLAG,0) == -1)
 		return -1;
 
 	if(getRepositoryMetadata(vaultFile, &repo) == -1)

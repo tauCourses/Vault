@@ -14,6 +14,8 @@
 #define START_BLOCK_DELIMITER '<'
 #define END_BLOCK_DELIMITER '>'
 
+#define VAULT_MODE_T 0644
+
 typedef struct 
 {
 	ssize_t size;
@@ -50,7 +52,6 @@ extern const off_t FILES_METADATA_OFFSET;
 extern const off_t BLOCKS_OFFSET;
 
 
-int openFile(int *file, char *address, int oflag);
 int openFile(int *file, char *address, int oflag, mode_t mode);
 
 int getRepositoryMetadata(int vaultFile, repositoryMetadata *repository);
