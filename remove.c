@@ -23,7 +23,7 @@ int removeFile(int argc, char *argv[])
 
 	struct timeval time;
 
-	if(argc != INSERT_NUMBER_OF_ARGUMENTS)
+	if(argc != REMOVE_NUMBER_OF_ARGUMENTS)
 	{
 		printf("Wrong number of arguments\n");
 		return -1;

@@ -18,6 +18,8 @@
 const off_t FILES_METADATA_OFFSET = sizeof(repositoryMetadata);
 const off_t BLOCKS_OFFSET = sizeof(repositoryMetadata) + MAX_NUMBER_OF_FILES * sizeof(fileMetadata);
 
+	
+
 int openFile(int *file, char *address, int oflag)
 {
 	char * name = basename	(address);
@@ -80,6 +82,7 @@ int getFilesMetadata(int vaultFile, fileMetadata *filesMetadataArray)
 	for(int i=0; i<MAX_NUMBER_OF_FILES; i++)
 	{
 		fileMetadata *tempFile = filesMetadataArray + i;
+
 		ssize_t len = read(vaultFile, (void *)(tempFile), sizeof(fileMetadata));
 
 		if(len < 0) //check that the read call succeeded 
@@ -107,6 +110,7 @@ int saveFilesMetadata(int vaultFile, const fileMetadata const *filesMetadataArra
 	for(int i=0; i<MAX_NUMBER_OF_FILES; i++)
 	{
 		const fileMetadata *tempFile = filesMetadataArray + i;
+
 		if(write(vaultFile, (void *)(tempFile), sizeof(fileMetadata)) < 0)
 		{
 			printf("Error write to vault file: %s\n", strerror(errno));
@@ -175,7 +179,7 @@ int findFreeBlocks(const fileMetadata const *files, ssize_t size, blockMetadata 
 	int numberOfBlocks = chainedToArray(fragBlocks,blocks);
 	if(numberOfBlocks == -1)
 		return -1;
-	qsort(*blocks, numberOfBlocks, sizeof(blockMetadata), blockComperator);
+	qsort(*blocks, numberOfBlocks, sizeof(blockMetadata), blockSizeComperator);
 	printf("Unused memory - start at %zu and in size of %zu\n", (*unUsedSpaceBlock)->offset, (*unUsedSpaceBlock)->size);
 	printBlockArray(*blocks, numberOfBlocks);
 	
@@ -297,7 +301,7 @@ int chainedToArray(chainedBlock *chianed, blockMetadata **array)
 	return numOfBlocks;
 }
 
-int blockComperator (const void * v1, const void * v2)
+int blockSizeComperator (const void * v1, const void * v2)
 {
 	const blockMetadata *p1 = (blockMetadata *)v1;
     const blockMetadata *p2 = (blockMetadata *)v2;
@@ -349,4 +353,72 @@ int writeCharToFile(int file, off_t offset, char c, int repitations)
 	}
 	free(arr);
 	return 0;
+}
+
+int getAllDataBlocks(fileMetadata *files, blockMetadata ***blocks)
+{
+	int numberOfBlocks = getNumberOfDataBlocks(files);
+
+	blockMetadata **tempBlocks =  malloc(numberOfBlocks * sizeof(*tempBlocks));
+
+	if(tempBlocks == NULL)
+		return -1;
+
+	int blockCounter = 0;
+	for(int i=0;i<MAX_NUMBER_OF_FILES;i++)
+	{
+		fileMetadata *tempFile = files + i;
+		if(tempFile->creationTime == 0)
+			break;
+		for(int j=0;j<NUMBER_OF_BLOCKS_PER_FILE;j++)
+		{
+			if(tempFile->blocks[j].size == 0)
+				break;
+			tempBlocks[blockCounter] = &(tempFile->blocks[j]);
+			blockCounter++;
+
+		}
+	}
+	
+	qsort(tempBlocks, numberOfBlocks, sizeof(blockMetadata*), blockOffsetComperator);
+	printf("data blocks sort by offset:\n");
+	printBlockPointer(tempBlocks, numberOfBlocks);
+	*blocks = tempBlocks;
+	return numberOfBlocks;
+}
+
+int getNumberOfDataBlocks(const fileMetadata const *files)
+{
+	int numberOfBlocks = 0;
+	for(int i=0;i<MAX_NUMBER_OF_FILES;i++)
+	{
+		const fileMetadata const *tempFile = files + i;
+		if(tempFile->creationTime == 0)
+			break;
+		for(int j=0;j<NUMBER_OF_BLOCKS_PER_FILE;j++)
+		{
+			if(tempFile->blocks[j].size == 0)
+				break;
+			numberOfBlocks++;
+
+		}
+	}
+	
+	return numberOfBlocks;
+}
+
+int blockOffsetComperator(const void * v1, const void * v2)
+{
+	const blockMetadata *p1 = *(blockMetadata * const *)v1;
+    const blockMetadata *p2 = *(blockMetadata * const *)v2;
+	
+	return p1->offset - p2->offset;
+	return 1;
+}
+
+void printBlockPointer(blockMetadata **blocks, int numberOfBlocks)
+{
+	for(int i=0;i<numberOfBlocks;i++)
+		printf("%d\t%zu\t%zu\n",i,blocks[i]->offset, blocks[i]->size);
+	printf("\n");
 }

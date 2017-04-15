@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h>
@@ -14,6 +15,9 @@
 #include "insertFile.h"
 #include "listing.h"
 #include "remove.h"
+
+#include "defrag.h"
+#include "status.h"
 
 
 #define _FILE_OFFSET_BITS 64
@@ -31,7 +35,13 @@ typedef enum {
 
 typedef int (*operationFunction)(int argc, char *argv[]); //function pointer definition
 
-operationFunction operationFunctionArray[] = {initVault, listing, insertFile, removeFile}; //an array of function pointers for each operation
+operationFunction operationFunctionArray[] = {	initVault, 
+												listing, 
+												insertFile, 
+												removeFile,
+												removeFile,//fetchFile,
+												defragVault,
+												getStatus}; //an array of function pointers for each operation
 
 OPERATIONS_TYPES getOperation(char* str);
 

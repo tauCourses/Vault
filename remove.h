@@ -3,7 +3,7 @@
 
 #include "vaultUtils.h"
 
-#define INSERT_NUMBER_OF_ARGUMENTS 4
+#define REMOVE_NUMBER_OF_ARGUMENTS 4
 #define REMOVE_VAULT_FILE_OPEN_FLAG O_RDWR 
 
 int removeFile(int argc, char *argv[]);

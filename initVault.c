@@ -13,13 +13,17 @@
 #include <time.h> 
 
 #include "initVault.h"
+#include "listing.h"
 
 int initVault(int argc, char *argv[])
 {
 	repositoryMetadata repo;
-	fileMetadata files[MAX_NUMBER_OF_FILES];
+	fileMetadata *files = (fileMetadata*) malloc(MAX_NUMBER_OF_FILES*sizeof(fileMetadata));
 	size_t fileSize;
 	int vaultFile;
+
+	if(files == NULL)
+		return -1;
 
 	if(argc != INIT_NUMBER_OF_ARGUMENTS)
 	{
@@ -38,20 +42,21 @@ int initVault(int argc, char *argv[])
 	}
 	if(openFile(&vaultFile, argv[1], INIT_FILE_OPEN_FLAG) == -1)
 		return -1;
+	
+
+	if(setFileSize(vaultFile, fileSize) == -1)
+		return -1;
 
 	if(setDefaultValues(&repo, files, fileSize) == -1)
 		return -1;
-
+	
 	if(saveRepositoryMetadata(vaultFile,repo) == -1)
 		return -1;
 
 	if(saveFilesMetadata(vaultFile,files) == -1)
 		return -1;
 
-	if(setFileSize(vaultFile, fileSize) == -1)
-		return -1;
-	
-
+	free(files);
 	return 0;
 }
 
@@ -71,17 +76,27 @@ int setDefaultValues(repositoryMetadata *repo, fileMetadata *files, size_t size)
 
 	for(int i=0;i<MAX_NUMBER_OF_FILES;i++)
 	{
-		fileMetadata *tempFile = files + i;
+		fileMetadata *tempFile = &files[i];
+
+		/*unsigned char* charPtr=(unsigned char*)tempFile;
+		printf("structure %d size : %zu bytes\n",i,sizeof(fileMetadata));
+  		for(int j=0;j<sizeof(fileMetadata);j++)
+      		printf("%02x ",charPtr[j]);*/
+		
 		strcpy( (*tempFile).name, "" );
 		(*tempFile).size = 0;
 		(*tempFile).permissions = 0;
 		(*tempFile).creationTime = 0;
 		for(int j=0;j<NUMBER_OF_BLOCKS_PER_FILE;j++)
 		{
-			blockMetadata *tempBlock = (*tempFile).blocks + j;
+			blockMetadata *tempBlock = &(*tempFile).blocks[j];
 			(*tempBlock).offset = 0;
 			(*tempBlock).size = 0;
 		} 
+		/*charPtr=(unsigned char*)tempFile;
+		printf("structure %d size : %zu bytes\n",i,sizeof(fileMetadata));
+  		for(int j=0;j<sizeof(fileMetadata);j++)
+      		printf("%02x ",charPtr[j]);*/
 	}
 	return 0;
 }

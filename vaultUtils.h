@@ -64,9 +64,16 @@ int checkIfFileExist(char *fileName, const fileMetadata const *files);
 int findFreeBlocks(const fileMetadata const *files, ssize_t size, blockMetadata **blocks, blockMetadata **unUsedSpaceBlock);
 int addBlockConstraint(blockMetadata constraintBlock, blockMetadata *unUsedSpaceBlock, chainedBlock **fragBlocks);
 int chainedToArray(chainedBlock *chianed, blockMetadata **array);
-int blockComperator (const void * v1, const void * v2);
+
 void printBlockArray(blockMetadata *array, int numOfBlocks);
+void printBlockPointer(blockMetadata **blocks, int numberOfBlocks);
 
 int writeCharToFile(int file, off_t offset, char c, int repitations);
+
+int getAllDataBlocks(fileMetadata *files, blockMetadata ***blocks);
+int getNumberOfDataBlocks(const fileMetadata const *files);
+
+int blockSizeComperator(const void * v1, const void * v2);
+int blockOffsetComperator(const void * v1, const void * v2);
 
 #endif
