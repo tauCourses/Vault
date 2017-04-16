@@ -50,6 +50,17 @@ int fetchFile(int argc, char *argv[])
 	if(copyFile(vaultFile, fetchFile, files[fetchFileNumber]) == -1)
 		return -1;
 
+	if(close(vaultFile) < 0)
+	{
+		printf("ERROR: unable to close file %s\n", strerror(errno));
+		return -1;
+	}
+	
+	if(close(fetchFile) < 0)
+	{
+		printf("ERROR: unable to close file %s\n", strerror(errno));
+		return -1;
+	}
 	return 0;
 }
 int copyFile(int vaultFile, int fetchFile, fileMetadata file)

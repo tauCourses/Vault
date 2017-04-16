@@ -1,14 +1,24 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <time.h>
+#include <dirent.h>
+#include <fcntl.h> // for open flags
+
+
+ 	
+
+
 
 #include "vaultUtils.h"
 
@@ -48,6 +58,11 @@ OPERATIONS_TYPES getOperation(char* str);
 
 int main( int argc, char *argv[] )  
 {
+	struct timeval start, end;
+  	long seconds, useconds;
+  	double mtime;
+
+	gettimeofday(&start, NULL);
 	if(argc<3)
 	{
 		printf("Wrong number of arguments\n");
@@ -63,6 +78,14 @@ int main( int argc, char *argv[] )
 	int value = (*operationFunctionArray[operation])(argc, argv);
 	if(value == -1)
 		printf("vault program failed\n");
+
+	gettimeofday(&end, NULL);
+
+    seconds  = end.tv_sec  - start.tv_sec;
+    useconds = end.tv_usec - start.tv_usec;
+    
+    mtime = ((seconds) * 1000 + useconds/1000.0);
+    printf("Elapsed time: %.3f milliseconds\n", mtime);
 	return value;
 }
 

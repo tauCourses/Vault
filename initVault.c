@@ -57,6 +57,11 @@ int initVault(int argc, char *argv[])
 		return -1;
 
 	free(files);
+	if(close(vaultFile) < 0)
+	{
+		printf("ERROR: unable to close file %s\n", strerror(errno));
+		return -1;
+	}
 	return 0;
 }
 
@@ -77,12 +82,7 @@ int setDefaultValues(repositoryMetadata *repo, fileMetadata *files, size_t size)
 	for(int i=0;i<MAX_NUMBER_OF_FILES;i++)
 	{
 		fileMetadata *tempFile = &files[i];
-
-		/*unsigned char* charPtr=(unsigned char*)tempFile;
-		printf("structure %d size : %zu bytes\n",i,sizeof(fileMetadata));
-  		for(int j=0;j<sizeof(fileMetadata);j++)
-      		printf("%02x ",charPtr[j]);*/
-		
+	
 		strcpy( (*tempFile).name, "" );
 		(*tempFile).size = 0;
 		(*tempFile).permissions = 0;
@@ -93,10 +93,6 @@ int setDefaultValues(repositoryMetadata *repo, fileMetadata *files, size_t size)
 			(*tempBlock).offset = 0;
 			(*tempBlock).size = 0;
 		} 
-		/*charPtr=(unsigned char*)tempFile;
-		printf("structure %d size : %zu bytes\n",i,sizeof(fileMetadata));
-  		for(int j=0;j<sizeof(fileMetadata);j++)
-      		printf("%02x ",charPtr[j]);*/
 	}
 	return 0;
 }

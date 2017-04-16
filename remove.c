@@ -50,13 +50,11 @@ int removeFile(int argc, char *argv[])
 		printf("File not exist\n");
 		return -1;
 	}
-	printf("Remove file number %d\n", removeFileNumber);
-
+	
 	if(removeDelimitersInFileBlocks(vaultFile, files[removeFileNumber].blocks) == -1)
 		return -1;
 	
 	lastFile = switchWithLastFile(vaultFile, files, removeFileNumber);
-	printf("last file is file number %d\n", lastFile);
 	if(lastFile == -1)
 		return -1;
 
@@ -69,7 +67,11 @@ int removeFile(int argc, char *argv[])
 	if(saveRepositoryMetadata(vaultFile, repo) == -1)
 		return -1;
 
-	printf("end remove\n");
+	if(close(vaultFile) < 0)
+	{
+		printf("ERROR: unable to close file %s\n", strerror(errno));
+		return -1;
+	}
 	return 0;
 }
 

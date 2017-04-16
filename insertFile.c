@@ -81,8 +81,10 @@ int insertFile(int argc, char *argv[])
 	if(numberOfChosenBlocks == -1)
 		return -1;
 
-	printf("\nchosen blcoks:\n");
-	printBlockArray(choosen, numberOfChosenBlocks);
+	#ifdef DEBUG_MODE
+		printf("\nchosen blcoks:\n");
+		printBlockArray(choosen, numberOfChosenBlocks);
+	#endif
 	
 	if(copyFileToBlocks(vaultFile, insertFile, requestedFileStatus.st_size, choosen, numberOfChosenBlocks) == -1)
 		return -1;
@@ -105,6 +107,17 @@ int insertFile(int argc, char *argv[])
 	free(fragBlocks);
 	free(unUsed);
 
+	if(close(vaultFile) < 0)
+	{
+		printf("ERROR: unable to close file %s\n", strerror(errno));
+		return -1;
+	}
+	if(close(insertFile) < 0)
+	{
+		printf("ERROR: unable to close file %s\n", strerror(errno));
+		return -1;
+	}
+
 	return 0;
 }
 
@@ -122,12 +135,15 @@ int findBlocksToSaveFile(ssize_t fileSize, blockMetadata *availableBlocks, int n
 		if(chosenBlocksSize - numOfChosenBlocks*DELIMETER_SIZE*2 >= fileSize)
 			break;
 	}
-	printf("size needed to be allocated - %zu\n", fileSize);
-	
+	#ifdef DEBUG_MODE
+		printf("size needed to be allocated - %zu\n", fileSize);
+	#endif
 	
 	if(chosenBlocksSize - numOfChosenBlocks*DELIMETER_SIZE*2 < fileSize) //need to use unUsed space
 	{
-		printf("need to use unUsed memory\n");
+		#ifdef DEBUG_MODE
+			printf("need to use unUsed memory\n");
+		#endif
 		if(numOfChosenBlocks == NUMBER_OF_BLOCKS_PER_FILE )
 		{
 			chosenBlocksSize -= availableBlocks[2].size; //remove the smallest block
@@ -157,13 +173,10 @@ int findBlocksToSaveFile(ssize_t fileSize, blockMetadata *availableBlocks, int n
 		}
 		else //not enough space to store the file in 3 blocks
 		{
-			printf("Not enought memory\n");
+			printf("Not enought memory to save the file\n");
 			return -1;
 		}
 	}
-
-	printf("number of block needed - %d\n", numOfChosenBlocks);
-	printf("chosen blocks size - %zu\n", chosenBlocksSize);
 	
 	//if the file can be stored in the gaps between used data:
 	*chosenBlocks = (blockMetadata*) malloc(numOfChosenBlocks * sizeof(blockMetadata));
@@ -191,10 +204,15 @@ int findBlocksToSaveFile(ssize_t fileSize, blockMetadata *availableBlocks, int n
 		
 		fileRemainSize -= ((*chosenBlocks)[numOfChosenBlocks-i-1].size - DELIMETER_SIZE*2);
 
-		printf("the %d block size is - %zu \t still need to fill %zu\n", 
-			numOfChosenBlocks-i-1, 
-			(*chosenBlocks)[numOfChosenBlocks-i-1].size, 
-			fileRemainSize);
+		#ifdef DEBUG_MODE
+			printf("Block offset - %zu\t Block size- %zu",   
+				(*chosenBlocks)[numOfChosenBlocks-i-1].offset, 
+				(*chosenBlocks)[numOfChosenBlocks-i-1].size);
+			if(fileRemainSize>0)
+				printf("\tstill need to fill %zu\n",fileRemainSize);
+			else
+				printf("\n");
+		#endif
 
 		topLimit = j;
 	}
@@ -242,7 +260,6 @@ int copyFileToBlocks(int vaultFile, int insertFile, size_t fileSize, blockMetada
 
 		offset += temp;
 	}
-	printf("printed %zu\n", offset);
 	return 0;
 }
 

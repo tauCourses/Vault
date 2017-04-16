@@ -35,13 +35,22 @@ int listing(int argc, char *argv[])
 		return -1;
 	if(getFilesMetadata(vaultFile, files) == -1)
 		return -1;
-
-	printVaultFileMetadata(repo,argv[1]);
+	
+	#ifdef DEBUG_MODE
+		printVaultFileMetadata(repo,argv[1]);
+	#endif
 
 	if(repo.files == 0)
 		return 0;
 	
 	printFilesMetaData(files, repo.files);
+
+	if(close(vaultFile) < 0)
+	{
+		printf("ERROR: unable to close file %s\n", strerror(errno));
+		return -1;
+	}
+
 	return 0;
 }
 

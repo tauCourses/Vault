@@ -42,6 +42,13 @@ int getStatus(int argc, char *argv[])
 		return -1;
 
 	printStatus(repo.files, totalSize, fragRatio);
+
+	if(close(vaultFile) < 0)
+	{
+		printf("ERROR: unable to close file %s\n", strerror(errno));
+		return -1;
+	}
+
 	return 0;
 }
 void printStatus(int numberOfFiles, size_t totalSize, double fragRatio)
@@ -65,7 +72,7 @@ double getFragmentationRatio(fileMetadata *files)
 	if(numberOfBlocks == -1)
 		return -1;
 	else if(numberOfBlocks == 0)
-		return -1;
+		return 0.0;
 	
 	size_t consumedSize = blocks[numberOfBlocks-1]->offset + blocks[numberOfBlocks-1]->size - blocks[0]->offset;
 	size_t gaps = getGapsLength(blocks,numberOfBlocks);

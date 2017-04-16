@@ -73,6 +73,12 @@ int defragVault(int argc, char *argv[])
 	if(saveRepositoryMetadata(vaultFile, repo) == -1)
 		return -1;
 	
+	if(close(vaultFile) < 0)
+	{
+		printf("ERROR: unable to close file %s\n", strerror(errno));
+		return -1;
+	}
+
 	return 0;
 }
 

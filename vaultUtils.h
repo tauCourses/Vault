@@ -6,8 +6,6 @@
 #define MAX_NUMBER_OF_FILES 100
 
 #define REPOSITORY_METADATA_OFFSET 0
-//#define FILES_METADATA_OFFSET sizeof(repositoryMetadata)
-//#define BLOCKS_OFFSET FILES_METADATA_OFFSET + MAX_NUMBER_OF_FILES * sizeof(fileMetadata)
 #define NUMBER_OF_BLOCKS_PER_FILE 3
 
 #define DELIMETER_SIZE 8 // the num signes <<<<<< and >>>>> for the begining and the end of a block
@@ -15,6 +13,9 @@
 #define END_BLOCK_DELIMITER '>'
 
 #define VAULT_MODE_T 0644
+
+//#define DEBUG_MODE
+
 
 typedef struct 
 {

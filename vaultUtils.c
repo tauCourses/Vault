@@ -183,9 +183,13 @@ int findFreeBlocks(const fileMetadata const *files, ssize_t size, blockMetadata 
 	if(numberOfBlocks == -1)
 		return -1;
 	qsort(*blocks, numberOfBlocks, sizeof(blockMetadata), blockSizeComperator);
-	printf("Unused memory - start at %zu and in size of %zu\n", (*unUsedSpaceBlock)->offset, (*unUsedSpaceBlock)->size);
-	printBlockArray(*blocks, numberOfBlocks);
-	
+
+	#ifdef DEBUG_MODE
+		printf("Memory state:\n");
+		printf("Unused memory - start at %zu and in size of %zu\n", (*unUsedSpaceBlock)->offset, (*unUsedSpaceBlock)->size);
+		printBlockArray(*blocks, numberOfBlocks);
+	#endif
+
 	return numberOfBlocks;
 }
 
@@ -323,11 +327,8 @@ int blockSizeComperator (const void * v1, const void * v2)
 
 void printBlockArray(blockMetadata *array, int numOfBlocks)
 {
-	if(numOfBlocks == 0)
-		printf("no blocks\n");
-	else
-		for(int i=0;i<numOfBlocks;i++)
-			printf("block %d - start at %zu and in size of %zu\n",i,array[i].offset,array[i].size);
+	for(int i=0;i<numOfBlocks;i++)
+		printf("block %d - start at %zu and in size of %zu\n",i,array[i].offset,array[i].size);
 
 	printf("\n");
 }
@@ -384,8 +385,17 @@ int getAllDataBlocks(fileMetadata *files, blockMetadata ***blocks)
 	}
 	
 	qsort(tempBlocks, numberOfBlocks, sizeof(blockMetadata*), blockOffsetComperator);
-	printf("data blocks sort by offset:\n");
-	printBlockPointer(tempBlocks, numberOfBlocks);
+
+	#ifdef DEBUG_MODE
+		if(blockCounter>0)
+		{
+			printf("data blocks sort by offset:\n");
+			printBlockPointer(tempBlocks, numberOfBlocks);
+		}
+		else
+			printf("not data blocks found, empty file\n");
+	#endif
+		
 	*blocks = tempBlocks;
 	return numberOfBlocks;
 }
