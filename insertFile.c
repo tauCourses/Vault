@@ -248,14 +248,22 @@ int copyFileToBlocks(int vaultFile, int insertFile, size_t fileSize, blockMetada
 	off_t offset = 0;
 	for(int i=0; i<numberOfBlocks; i++)
 	{	
+		
+		off_t temp = copyBlockToVault(vaultFile, insertFile, blocks[i].offset, offset, blocks[i].size-DELIMETER_SIZE*2);
+		if(temp == -1)
+		{
+			for(int j=0;j<i;j++)
+			{
+				writeCharToFile(vaultFile, blocks[j].offset, '\0', DELIMETER_SIZE);
+				writeCharToFile(vaultFile, blocks[j].offset+blocks[j].size - DELIMETER_SIZE, '\0', DELIMETER_SIZE);
+			}
+			return -1;
+		}
+
 		if(writeCharToFile(vaultFile, blocks[i].offset, START_BLOCK_DELIMITER, DELIMETER_SIZE) == -1)
 			return -1;
 
-		off_t temp = copyBlockToVault(vaultFile, insertFile, blocks[i].offset, offset, blocks[i].size-DELIMETER_SIZE*2);
-		if(temp == -1)
-			return -1;
-
-		if(writeCharToFile(vaultFile, 0, END_BLOCK_DELIMITER, DELIMETER_SIZE) == -1)
+		if(writeCharToFile(vaultFile, blocks[i].offset+blocks[i].size - DELIMETER_SIZE, END_BLOCK_DELIMITER, DELIMETER_SIZE) == -1)
 			return -1;
 
 		offset += temp;
@@ -267,6 +275,11 @@ off_t copyBlockToVault(int vaultFile, int insertFile, off_t vaultFileOffset, off
 {
 	char buffer[FILE_BUFFER_SIZE];
 	size_t readingSize = size;
+	if(lseek(vaultFile, vaultFileOffset + DELIMETER_SIZE, SEEK_SET) < 0) 
+	{
+		printf("Error write to vault file: %s\n", strerror(errno));
+		return -1;
+	}	
 	while(readingSize > 0) //while more bytes need to be processed
 	{
 		ssize_t len;

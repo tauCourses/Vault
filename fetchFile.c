@@ -47,8 +47,22 @@ int fetchFile(int argc, char *argv[])
 	if(openFile(&fetchFile, argv[3], FETCH_NEW_FILE_OPEN_FLAG, files[fetchFileNumber].permissions) == -1) //todo - permmisions!
 		return -1;
 
-	if(copyFile(vaultFile, fetchFile, files[fetchFileNumber]) == -1)
+	if(fchmod(fetchFile,files[fetchFileNumber].permissions) < 0)
+	{
+		printf("Failed to create the file in the right premissions - %s\n", strerror(errno));
+		if(unlink(argv[3]) == -1)
+			printf("Failed to delete the new file - %s\n", strerror(errno));
+
 		return -1;
+	}
+
+	if(copyFile(vaultFile, fetchFile, files[fetchFileNumber]) == -1)
+	{
+		if(unlink(argv[3]) == -1)
+			printf("Failed to delete the new file - %s\n", strerror(errno));
+
+		return -1;
+	}	
 
 	if(close(vaultFile) < 0)
 	{
@@ -69,6 +83,11 @@ int copyFile(int vaultFile, int fetchFile, fileMetadata file)
 	{
 		if(file.blocks[i].size == 0)
 			break;
+	
+		#ifdef DEBUG_MODE
+			printf("copy block number %d in size of %zu\n",i,file.blocks[i].size);
+		#endif
+	
 		copyBlock(vaultFile, fetchFile, file.blocks[i]);
 	}
 	return 0;
@@ -82,18 +101,15 @@ int copyBlock(int vaultFile, int fetchFile, blockMetadata block)
 		printf("Error seek in vault file: %s\n", strerror(errno));
 		return -1;
 	}	
+	printf("reading size - %zu\n", readingSize);
 	while(readingSize > 0) //while more bytes need to be processed
 	{
-		ssize_t len;
-		if(readingSize<FILE_BUFFER_SIZE) //read the minimum between readingSize and bufferSize
-			len = readAll(vaultFile, buffer, readingSize);
-		else
-			len = readAll(vaultFile, buffer, FILE_BUFFER_SIZE);
-
-		if(len < 0) //check that the read call succeeded 
+		ssize_t len = (readingSize<FILE_BUFFER_SIZE) ? readingSize : FILE_BUFFER_SIZE;
+		
+		if(readAll(vaultFile, buffer, len) < 0) //check that the read call succeeded 
 			return -1;
 		
-		if(writeAll(fetchFile, buffer, len))
+		if(writeAll(fetchFile, buffer, len) < 0)
 			return -1;
 		
 		readingSize -= len;

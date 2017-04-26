@@ -44,15 +44,20 @@ int readAll(int file, void * buffer, size_t size)
 		return 1;
 	do
 	{
+//		printf("size - %zu\n",size);
 		len = read(file, location, size);	
-		if(len <= 0)
+		if(len == -1)
 		{
+			printf("len - %zu\n", len);
 			printf("Error reading from file: %s\n", strerror(errno));
 			return -1;	
 		}
+		else if(len == 0)
+			break;
 		size-=len;
+//		printf("size2 - %zu\n",size);
 		location += len;
-	} while(size>0);
+	} while(size>0 || len == 0);
 	return 1;
 }
 int writeAll(int file, void * buffer, size_t size)
@@ -61,9 +66,10 @@ int writeAll(int file, void * buffer, size_t size)
 	ssize_t len;
 	if(size == 0)
 		return 1;
+
 	do
 	{
-		len = write(file, location, sizeof(repositoryMetadata));
+		len = write(file, location, size);
 		if(len <= 0)
 		{
 			printf("Error Writing to file: %s\n", strerror(errno));
