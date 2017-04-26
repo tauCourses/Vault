@@ -14,7 +14,7 @@
 
 #define VAULT_MODE_T 0644
 
-//#define DEBUG_MODE
+#define DEBUG_MODE
 
 
 typedef struct 
@@ -52,6 +52,8 @@ struct _chainedBlock //used to find all avialable blocks
 extern const off_t FILES_METADATA_OFFSET;
 extern const off_t BLOCKS_OFFSET;
 
+int readAll(int file, void * buffer, size_t size);
+int writeAll(int file, void * buffer, size_t size);
 
 int openFile(int *file, char *address, int oflag, mode_t mode);
 

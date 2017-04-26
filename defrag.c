@@ -115,12 +115,11 @@ int moveBlockData(int vaultFile, off_t old, off_t new, size_t size)
 			printf("Error seek in vault file: %s\n", strerror(errno));
 			return -1;
 		}	
-	
 		
 		if(readingSize<FILE_BUFFER_SIZE) //read the minimum between readingSize and bufferSize
-			len = read(vaultFile, buffer, readingSize);
+			len = readAll(vaultFile, buffer, readingSize);
 		else
-			len = read(vaultFile, buffer, FILE_BUFFER_SIZE);
+			len = readAll(vaultFile, buffer, FILE_BUFFER_SIZE);
 
 		if(len < 0) //check that the read call succeeded 
 		{
@@ -134,12 +133,9 @@ int moveBlockData(int vaultFile, off_t old, off_t new, size_t size)
 			return -1;
 		}	
 
-		ssize_t bytes_written = write(vaultFile, buffer, len);
-		if(bytes_written != len)
-		{
-			printf("Error writing to output file: %s\n", strerror(errno));
+		if(writeAll(vaultFile, buffer, len)<0)
 			return -1;
-		}	
+			
 
 		readingSize -= len;
 		currentPosition +=len;

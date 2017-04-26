@@ -36,6 +36,45 @@ int openFile(int *file, char *address, int oflag, mode_t mode)
 	return 0;
 }
 
+int readAll(int file, void * buffer, size_t size)
+{
+	void *location = buffer;
+	ssize_t len;
+	if(size == 0)
+		return 1;
+	do
+	{
+		len = read(file, location, size);	
+		if(len <= 0)
+		{
+			printf("Error reading from file: %s\n", strerror(errno));
+			return -1;	
+		}
+		size-=len;
+		location += len;
+	} while(size>0);
+	return 1;
+}
+int writeAll(int file, void * buffer, size_t size)
+{
+	void *location = buffer;
+	ssize_t len;
+	if(size == 0)
+		return 1;
+	do
+	{
+		len = write(file, location, sizeof(repositoryMetadata));
+		if(len <= 0)
+		{
+			printf("Error Writing to file: %s\n", strerror(errno));
+			return -1;	
+		}
+		size-=len;
+		location += len;
+	} while (size>0);	
+	return 1;
+}
+
 int getRepositoryMetadata(int vaultFile, repositoryMetadata *repository)
 {
 	if(lseek(vaultFile, REPOSITORY_METADATA_OFFSET, SEEK_SET) < 0) 
@@ -43,19 +82,10 @@ int getRepositoryMetadata(int vaultFile, repositoryMetadata *repository)
 		printf("Error seek in vault file: %s\n", strerror(errno));
 		return -1;
 	}	
-	ssize_t len = read(vaultFile, (void *)(repository), sizeof(repositoryMetadata));
 
-	if(len < 0) //check that the read call succeeded 
-	{
-		printf("Error reading from vault file: %s\n", strerror(errno));
+	if(readAll(vaultFile, (void *)(repository), sizeof(repositoryMetadata)) < 0) //check that the read call succeeded 
 		return -1;
-	}
-	else if(len != sizeof(repositoryMetadata))
-	{
-		printf("len - %zu", len);
-		printf("Error - reading metadata failed\n");
-		return -1;
-	}
+	
 	return 0;
 }
 
@@ -67,11 +97,9 @@ int saveRepositoryMetadata(int vaultFile, repositoryMetadata repository)
 		return -1;
 	}
 
-	if(write(vaultFile, (void *)(&repository), sizeof(repositoryMetadata)) < 0)
-	{
-		printf("Error write to vault file: %s\n", strerror(errno));
+	if(writeAll(vaultFile, (void *)(&repository), sizeof(repositoryMetadata)) < 0)
 		return -1;
-	}
+	
 	return 0;
 }
 
@@ -86,18 +114,8 @@ int getFilesMetadata(int vaultFile, fileMetadata *filesMetadataArray)
 	{
 		fileMetadata *tempFile = filesMetadataArray + i;
 
-		ssize_t len = read(vaultFile, (void *)(tempFile), sizeof(fileMetadata));
-
-		if(len < 0) //check that the read call succeeded 
-		{
-			printf("Error reading from vault file: %s\n", strerror(errno));
+		if(readAll(vaultFile, (void *)(tempFile), sizeof(fileMetadata))<0)
 			return -1;
-		}
-		else if(len != sizeof(fileMetadata))
-		{
-			printf("Error - reading files metadata failed\n");
-			return -1;
-		}
 	}
 	return 0;
 }
@@ -114,11 +132,8 @@ int saveFilesMetadata(int vaultFile, const fileMetadata const *filesMetadataArra
 	{
 		const fileMetadata *tempFile = filesMetadataArray + i;
 
-		if(write(vaultFile, (void *)(tempFile), sizeof(fileMetadata)) < 0)
-		{
-			printf("Error write to vault file: %s\n", strerror(errno));
+		if(writeAll(vaultFile, (void *)(tempFile), sizeof(fileMetadata)) < 0)
 			return -1;
-		}
 	}
 	return 0;
 }
@@ -130,11 +145,9 @@ int saveFileLine(int vaultFile, fileMetadata newFile, int newFileNumber)
 		printf("Error seek in vault file: %s\n", strerror(errno));
 		return -1;
 	}	
-	if(write(vaultFile, (void *)(&newFile), sizeof(fileMetadata)) < 0)
-	{
-		printf("Error write to vault file: %s\n", strerror(errno));
+	if(writeAll(vaultFile, (void *)(&newFile), sizeof(fileMetadata)) < 0)
 		return -1;
-	}
+	
 	return 0;
 }
 
@@ -308,7 +321,7 @@ int chainedToArray(chainedBlock *chianed, blockMetadata **array)
 	return numOfBlocks;
 }
 
-int blockSizeComperator (const void * v1, const void * v2)
+int blockSizeComperator (const void * v1, const void * v2) //compare between two blocks by the size
 {
 	const blockMetadata *p1 = (blockMetadata *)v1;
     const blockMetadata *p2 = (blockMetadata *)v2;
@@ -325,7 +338,7 @@ int blockSizeComperator (const void * v1, const void * v2)
     return 0;
 }
 
-void printBlockArray(blockMetadata *array, int numOfBlocks)
+void printBlockArray(blockMetadata *array, int numOfBlocks) //print an array of blocks, for debugging
 {
 	for(int i=0;i<numOfBlocks;i++)
 		printf("block %d - start at %zu and in size of %zu\n",i,array[i].offset,array[i].size);
@@ -333,7 +346,7 @@ void printBlockArray(blockMetadata *array, int numOfBlocks)
 	printf("\n");
 }
 
-int writeCharToFile(int file, off_t offset, char c, int repitations)
+int writeCharToFile(int file, off_t offset, char c, int repitations) //enable write a swerius of a char to a file 
 {
 	char *arr = (char *) malloc(sizeof(char)*repitations);
 	if(arr == NULL)
@@ -395,7 +408,7 @@ int getAllDataBlocks(fileMetadata *files, blockMetadata ***blocks)
 		else
 			printf("not data blocks found, empty file\n");
 	#endif
-		
+
 	*blocks = tempBlocks;
 	return numberOfBlocks;
 }

@@ -271,21 +271,16 @@ off_t copyBlockToVault(int vaultFile, int insertFile, off_t vaultFileOffset, off
 	{
 		ssize_t len;
 		if(readingSize<FILE_BUFFER_SIZE) //read the minimum between readingSize and bufferSize
-			len = read(insertFile, buffer, readingSize);
+			len = readAll(insertFile, buffer, readingSize);
 		else
-			len = read(insertFile, buffer, FILE_BUFFER_SIZE);
+			len = readAll(insertFile, buffer, FILE_BUFFER_SIZE);
 
 		if(len < 0) //check that the read call succeeded 
-		{
-			printf("Error reading from input file: %s\n", strerror(errno));
 			return -1;
-		}
-		ssize_t bytes_written = write(vaultFile, buffer, len);
-		if(bytes_written != len)
-		{
-			printf("Error writing to output file: %s\n", strerror(errno));
+		
+		if(writeAll(vaultFile, buffer, len) < 0)
 			return -1;
-		}	
+			
 		readingSize -= len;
 	}
 	return size;

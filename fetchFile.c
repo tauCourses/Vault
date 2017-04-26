@@ -86,21 +86,16 @@ int copyBlock(int vaultFile, int fetchFile, blockMetadata block)
 	{
 		ssize_t len;
 		if(readingSize<FILE_BUFFER_SIZE) //read the minimum between readingSize and bufferSize
-			len = read(vaultFile, buffer, readingSize);
+			len = readAll(vaultFile, buffer, readingSize);
 		else
-			len = read(vaultFile, buffer, FILE_BUFFER_SIZE);
+			len = readAll(vaultFile, buffer, FILE_BUFFER_SIZE);
 
 		if(len < 0) //check that the read call succeeded 
-		{
-			printf("Error reading from input file: %s\n", strerror(errno));
 			return -1;
-		}
-		ssize_t bytes_written = write(fetchFile, buffer, len);
-		if(bytes_written != len)
-		{
-			printf("Error writing to output file: %s\n", strerror(errno));
+		
+		if(writeAll(fetchFile, buffer, len))
 			return -1;
-		}	
+		
 		readingSize -= len;
 	}
 	return 0;
