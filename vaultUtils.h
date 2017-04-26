@@ -1,6 +1,8 @@
 #ifndef VAULT_UTILS_HEADER_FILE
 #define VAULT_UTILS_HEADER_FILE
 
+//yes! you can change any of the parameters and it should works fine!!! 
+
 #define FILE_BUFFER_SIZE 1024
 #define FILE_NAME_MAX_SIZE 256
 #define MAX_NUMBER_OF_FILES 100
@@ -14,7 +16,7 @@
 
 #define VAULT_MODE_T 0644
 
-#define DEBUG_MODE
+//#define DEBUG_MODE //uncomment to get more info about the process
 
 
 typedef struct 

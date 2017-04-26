@@ -9,6 +9,8 @@
 int listing(int argc, char *argv[]);
 void printVaultFileMetadata(repositoryMetadata repo, char* vaultFilePath);
 void printFilesMetaData(fileMetadata *files, int numberOfFiles);
-void printsize(ssize_t size, char *str);
+void getSizeString(ssize_t size, char *str);
+void getPermissionsString(char* str, mode_t permission);
+
 
 #endif

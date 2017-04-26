@@ -15,12 +15,7 @@
 #include <dirent.h>
 #include <fcntl.h> // for open flags
 
-
- 	
-
-
-
-#include "vaultUtils.h"
+#include "vaultUtils.h" //here is all the important structures and constances
 
 #include "initVault.h"
 #include "insertFile.h"
@@ -61,23 +56,27 @@ int main( int argc, char *argv[] )
 	struct timeval start, end;
   	long seconds, useconds;
   	double mtime;
-
+  	int value = -1; 
 	gettimeofday(&start, NULL);
-	if(argc<3)
-	{
-		printf("Wrong number of arguments\n");
-		return -1;
-	}
-	OPERATIONS_TYPES operation = getOperation(argv[2]);
 
-	if(operation == UNKNOWN_OPERATION)
+	if(argc>=3) //if there are at least 3 arguments
 	{
-		printf("Unknown operation\n");
-		return -1;
+		OPERATIONS_TYPES operation = getOperation(argv[2]); //get operation
+
+		if(operation != UNKNOWN_OPERATION) //if it's a known operation 
+		{
+			value = (*operationFunctionArray[operation])(argc, argv);
+			if(value == -1)
+				printf("vault program failed\n");
+		}
+		else
+			printf("Unknown operation\n");
 	}
-	int value = (*operationFunctionArray[operation])(argc, argv);
-	if(value == -1)
-		printf("vault program failed\n");
+	else
+		printf("Wrong number of arguments\n");
+	
+	
+
 
 	gettimeofday(&end, NULL);
 

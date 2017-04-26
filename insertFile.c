@@ -24,7 +24,7 @@ int insertFile(int argc, char *argv[])
 	int insertFile;
 
 	blockMetadata *fragBlocks = NULL , *unUsed = NULL, *choosen = NULL;
-	int numberOfFragBlocks, numberOfChosenBlocks;
+	int numberOfFragBlocks, numberOfChosenBlocks = 0;
 	
 	struct timeval time;
 	char * newFileName = basename(argv[3]);
@@ -47,7 +47,7 @@ int insertFile(int argc, char *argv[])
 	
 	if(repo.files == MAX_NUMBER_OF_FILES)
 	{
-		printf("File system is full, can't insert a new file");
+		printf("File system is full, can't insert a new file\n");
 		return -1;
 	}
 	
@@ -76,18 +76,25 @@ int insertFile(int argc, char *argv[])
 	if(numberOfFragBlocks == -1)
 		return -1;
 
-	
-	numberOfChosenBlocks = findBlocksToSaveFile(requestedFileStatus.st_size, fragBlocks, numberOfFragBlocks, unUsed, &choosen);
-	if(numberOfChosenBlocks == -1)
-		return -1;
+	if(requestedFileStatus.st_size > 0)
+	{
+		numberOfChosenBlocks = findBlocksToSaveFile(requestedFileStatus.st_size, fragBlocks, numberOfFragBlocks, unUsed, &choosen);
+		if(numberOfChosenBlocks == -1)
+			return -1;
 
+		#ifdef DEBUG_MODE
+			printf("\nchosen blcoks:\n");
+			printBlockArray(choosen, numberOfChosenBlocks);
+		#endif
+
+		if(copyFileToBlocks(vaultFile, insertFile, requestedFileStatus.st_size, choosen, numberOfChosenBlocks) == -1)
+		return -1;
+	}
 	#ifdef DEBUG_MODE
-		printf("\nchosen blcoks:\n");
-		printBlockArray(choosen, numberOfChosenBlocks);
+	else
+		printf("file size is zero, no blocks is needed\n");
 	#endif
 	
-	if(copyFileToBlocks(vaultFile, insertFile, requestedFileStatus.st_size, choosen, numberOfChosenBlocks) == -1)
-		return -1;
 
 	newFileNumber = createNewFile(&newFile, files, newFileName, requestedFileStatus.st_size, requestedFileStatus.st_mode,
 						time.tv_sec, choosen, numberOfChosenBlocks);
@@ -282,13 +289,9 @@ off_t copyBlockToVault(int vaultFile, int insertFile, off_t vaultFileOffset, off
 	}	
 	while(readingSize > 0) //while more bytes need to be processed
 	{
-		ssize_t len;
-		if(readingSize<FILE_BUFFER_SIZE) //read the minimum between readingSize and bufferSize
-			len = readAll(insertFile, buffer, readingSize);
-		else
-			len = readAll(insertFile, buffer, FILE_BUFFER_SIZE);
+		ssize_t len = readingSize<FILE_BUFFER_SIZE ? readingSize : FILE_BUFFER_SIZE;
 
-		if(len < 0) //check that the read call succeeded 
+		if(readAll(insertFile, buffer, len) == -1) //check that the read call succeeded 
 			return -1;
 		
 		if(writeAll(vaultFile, buffer, len) < 0)

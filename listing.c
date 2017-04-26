@@ -67,7 +67,7 @@ void printVaultFileMetadata(repositoryMetadata repo, char* vaultFilePath)
 	strftime(timeString, 20, "%Y-%m-%d %H:%M:%S", localtime(&(repo.modificationTime)));
 	printf("Last modified at - %s\n",timeString);
 	
-	printsize(repo.size, fileSize);
+	getSizeString(repo.size, fileSize);
 	printf("Total file size - %s\n\n",fileSize);
 
 	printf("Consist %d files", repo.files);
@@ -79,14 +79,16 @@ void printVaultFileMetadata(repositoryMetadata repo, char* vaultFilePath)
 
 void printFilesMetaData(fileMetadata *files, int numberOfFiles)
 {
-	char timeString[20];
+	char timeString[40];
 	char fileSize[10];
+	char permission[100] = "asds";
 	for(int i=0; i<numberOfFiles && i<MAX_NUMBER_OF_FILES;i++)
 	{
 		fileMetadata *tempFile = files + i;
-		strftime(timeString, 20, "%Y-%m-%d %H:%M:%S", localtime(&((*tempFile).creationTime)));
-		printsize((*tempFile).size,fileSize);
-		printf("%s\t%s\t%d\t%s\n", (*tempFile).name,fileSize,(*tempFile).permissions,timeString);
+		strftime(timeString, 40, "%c", localtime(&(tempFile->creationTime)));
+		getSizeString(tempFile->size,fileSize);
+		getPermissionsString(permission, tempFile->permissions);
+		printf("%s\t%s\t%s\t%s\n", tempFile->name, fileSize, permission, timeString);
 
 	}
 }
@@ -94,7 +96,7 @@ void printFilesMetaData(fileMetadata *files, int numberOfFiles)
 
 //CRADIT - ssize_t to readable char* http://stackoverflow.com/questions/3898840/converting-a-number-of-bytes-into-a-file-size-in-c
 //I changed it a bit to make it easier to use for me
-void printsize(ssize_t size, char *str)
+void getSizeString(ssize_t size, char *str)
 {                   
     static const char *SIZES[] = { "B", "kB", "MB", "GB" };
     size_t div = 0;
@@ -105,7 +107,15 @@ void printsize(ssize_t size, char *str)
         div++;   
         size /= 1024;
     }
-
-    sprintf(str, "%.1f %s", (float)size + (float)rem / 1024.0, SIZES[div]);
+    if(div > 0)
+	    sprintf(str, "%.1f%s", (float)size + (float)rem / 1024.0, SIZES[div]);
+	else
+		sprintf(str, "%dB", (int)size);
+	
 }
 //end cradit
+
+void getPermissionsString(char* str, mode_t permission)
+{
+	sprintf(str, "0%0o", permission%01000);
+}

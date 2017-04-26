@@ -101,7 +101,6 @@ int copyBlock(int vaultFile, int fetchFile, blockMetadata block)
 		printf("Error seek in vault file: %s\n", strerror(errno));
 		return -1;
 	}	
-	printf("reading size - %zu\n", readingSize);
 	while(readingSize > 0) //while more bytes need to be processed
 	{
 		ssize_t len = (readingSize<FILE_BUFFER_SIZE) ? readingSize : FILE_BUFFER_SIZE;
