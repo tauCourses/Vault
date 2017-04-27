@@ -36,7 +36,7 @@ int initVault(int argc, char *argv[])
 
 	if(fileSize <= BLOCKS_OFFSET)
 	{
-		printf("minimum size %zu, size allocate %zu\n", BLOCKS_OFFSET, fileSize);
+		printf("minimum size %ld, size allocate %zu\n", BLOCKS_OFFSET, fileSize);
 		printf("Size is too small, please create a bigger file\n");
 		return -1;
 	}

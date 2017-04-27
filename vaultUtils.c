@@ -347,7 +347,7 @@ int blockSizeComperator (const void * v1, const void * v2) //compare between two
 void printBlockArray(blockMetadata *array, int numOfBlocks) //print an array of blocks, for debugging
 {
 	for(int i=0;i<numOfBlocks;i++)
-		printf("block %d - start at %zu and in size of %zu\n",i,array[i].offset,array[i].size);
+		printf("block %d - start at %ld and in size of %zu\n",i,array[i].offset,array[i].size);
 
 	printf("\n");
 }
@@ -451,6 +451,6 @@ int blockOffsetComperator(const void * v1, const void * v2)
 void printBlockPointer(blockMetadata **blocks, int numberOfBlocks)
 {
 	for(int i=0;i<numberOfBlocks;i++)
-		printf("%d\t%zu\t%zu\n",i,blocks[i]->offset, blocks[i]->size);
+		printf("%d\t%ld\t%zu\n",i,blocks[i]->offset, blocks[i]->size);
 	printf("\n");
 }

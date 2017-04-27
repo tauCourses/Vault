@@ -35,7 +35,7 @@ typedef struct
 
 typedef struct 
 {
-	char name[FILE_NAME_MAX_SIZE];
+	char name[FILE_NAME_MAX_SIZE + 1];
 	ssize_t size;
 	mode_t permissions;
 	time_t creationTime;
