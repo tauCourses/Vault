@@ -4,7 +4,9 @@
 //yes! you can change any of the parameters and it should works fine!!! 
 
 #define FILE_BUFFER_SIZE 1024
-#define FILE_NAME_MAX_SIZE 256
+#define FILE_NAME_MAX_SIZE 256 
+//why 256 chars is enough? because the length of any filename in linux file system is 255 chars and a \0 to the end of the string 
+//can be changed to 257 in case we want to check it with different file system that allow 256 symbols file name
 #define MAX_NUMBER_OF_FILES 100
 
 #define REPOSITORY_METADATA_OFFSET 0
@@ -35,7 +37,7 @@ typedef struct
 
 typedef struct 
 {
-	char name[FILE_NAME_MAX_SIZE + 1];
+	char name[FILE_NAME_MAX_SIZE]; 
 	ssize_t size;
 	mode_t permissions;
 	time_t creationTime;

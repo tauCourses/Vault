@@ -80,11 +80,11 @@ int main( int argc, char *argv[] )
 
 	gettimeofday(&end, NULL);
 
-    seconds  = end.tv_sec  - start.tv_sec;
-    useconds = end.tv_usec - start.tv_usec;
+	seconds  = end.tv_sec  - start.tv_sec;
+	useconds = end.tv_usec - start.tv_usec;
     
-    mtime = ((seconds) * 1000 + useconds/1000.0);
-    printf("Elapsed time: %.3f milliseconds\n", mtime);
+	mtime = ((seconds) * 1000 + useconds/1000.0);
+	printf("Elapsed time: %.3f milliseconds\n", mtime);
 	return value;
 }
 
@@ -92,7 +92,7 @@ OPERATIONS_TYPES getOperation(char* str)
 {
 	//CRADIT http://stackoverflow.com/questions/2661766/c-convert-a-mixed-case-string-to-all-lower-case
 	for (char *ch = str; *ch; ++ch) *ch = tolower(*ch);
-	//END CRADIT!!! 
+	//END CRADIT
 
 	if(strcmp(str,"init") == 0)
 		return INIT_OPERATION;
